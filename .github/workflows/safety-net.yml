@@ -1,0 +1,25 @@
+name: Safety Net Push
+
+on:
+  schedule:
+    - cron: "0 16 * * *"  # Runs at 11:00 PM Vietnam time (UTC+7 -> 16:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Update safety_net.txt
+        run: |
+          echo "Safety net push at $(date -u)" > safety_net.txt
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add safety_net.txt
+          git commit -m "🛡️ Safety net auto-push"
+          git push
