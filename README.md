@@ -4,9 +4,9 @@ A repository that holds me accountable when I fail to push code daily.
 
 ---
 
-## 😔 Total Shameful Days: **0**
-## 🗓️ Last Shame: **Never**
-## 🔥 Current Discipline Streak: **🔥 Perfect Discipline! days**
+## 😔 Total Shameful Days: **1**
+## 🗓️ Last Shame: **2025-06-13**
+## 🔥 Current Discipline Streak: **0 days**
 
 ---
 
