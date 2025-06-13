@@ -1,3 +1,15 @@
-# Wall-Of-Shame
-![Wall of Shame Status](https://github.com/WillyPhan06/wall-of-shame/actions/workflows/shame.yml/badge.svg)
-Hello! If you ever wondering why I can keep up the contribution streak then it's because of my daily pushing discipline. But when I slip on a random day and can't contribute, that's when this thing kicks in and saves the game by pushing a dummy file at 10:30pm my local time if i haven't contributed on that day.
+# 🧱 Wall of Shame
+
+A repository that holds me accountable when I fail to push code daily.
+
+---
+
+## 😔 Total Shameful Days: **1**
+## 🗓️ Last Shame: **2025-06-13**
+## 🔥 Current Discipline Streak: **0 days**
+
+---
+
+If you're reading this, I either:
+- Coded and pushed today 💪
+- Or... this repo is calling me out 😤
