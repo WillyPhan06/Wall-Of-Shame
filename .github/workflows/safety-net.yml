@@ -18,8 +18,8 @@ jobs:
 
       - name: Commit and Push
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "WillyPhan06"
+          git config user.email "resuviketer4@gmail.com"
           git add safety_net.txt
           git commit -m "🛡️ Safety net auto-push"
           git push
