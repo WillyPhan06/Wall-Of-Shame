@@ -8,28 +8,57 @@ REPO_NAME = "wall-of-shame"
 README_FILE = "README.md"
 SHA_FOLDER = "shames"
 
+# Ensure shame folder exists
 if not os.path.exists(SHA_FOLDER):
     os.makedirs(SHA_FOLDER)
 
 def has_contributed_today():
-    today = datetime.utcnow().date().isoformat()
-    url = f"https://api.github.com/users/{GITHUB_USERNAME}/events/public"
+    today = datetime.now(datetime.timezone.utc).date().isoformat()
+
+    query = """
+    query($login: String!) {
+      user(login: $login) {
+        contributionsCollection {
+          contributionCalendar {
+            weeks {
+              contributionDays {
+                date
+                contributionCount
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    variables = {"login": GITHUB_USERNAME}
     headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json"
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Content-Type": "application/json"
     }
 
-    print(f"📅 Checking contributions for {GITHUB_USERNAME} on {today}")
-    response = requests.get(url, headers=headers)
+    print(f"📅 Checking GraphQL contributions for {GITHUB_USERNAME} on {today}")
+    response = requests.post(
+        "https://api.github.com/graphql",
+        json={"query": query, "variables": variables},
+        headers=headers
+    )
 
     if response.status_code != 200:
-        print(f"⚠️ GitHub API error: {response.status_code}")
+        print(f"⚠️ GraphQL API error: {response.status_code}")
+        print(response.text)
         return False
 
-    for event in response.json():
-        if today in event.get("created_at", ""):
-            return True
+    data = response.json()
+    weeks = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]["weeks"]
+    for week in weeks:
+        for day in week["contributionDays"]:
+            if day["date"] == today and day["contributionCount"] > 0:
+                print(f"✅ Contribution found on {today}")
+                return True
 
+    print(f"❌ No contributions found on {today}")
     return False
 
 def get_shame_stats():
