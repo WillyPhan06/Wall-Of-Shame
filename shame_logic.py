@@ -13,32 +13,59 @@ if not os.path.exists(SHA_FOLDER):
     os.makedirs(SHA_FOLDER)
 
 def has_contributed_today():
-    url = f"https://api.github.com/users/{GITHUB_USERNAME}/events/public"
+    import json
+
+    today = datetime.now(timezone.utc).date().isoformat()
+
+    query = """
+    query ($login: String!) {
+      user(login: $login) {
+        contributionsCollection {
+          contributionCalendar {
+            weeks {
+              contributionDays {
+                date
+                contributionCount
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    variables = {"login": GITHUB_USERNAME}
+
     headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json"
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Content-Type": "application/json"
     }
 
-    print(f"📅 Checking recent GitHub activity for {GITHUB_USERNAME}")
-    response = requests.get(url, headers=headers)
+    response = requests.post(
+        "https://api.github.com/graphql",
+        headers=headers,
+        json={"query": query, "variables": variables}
+    )
 
     if response.status_code != 200:
-        print(f"⚠️ GitHub API error: {response.status_code}")
+        print(f"⚠️ GitHub GraphQL API error: {response.status_code}")
         print(response.text)
         return False
 
-    events = response.json()
-    today = datetime.now(timezone.utc).date()
+    data = response.json()
 
-    for event in events:
-        if event["type"] == "PushEvent":
-            event_date = datetime.strptime(event["created_at"], "%Y-%m-%dT%H:%M:%SZ").date()
-            if event_date == today:
-                print(f"✅ Found a PushEvent today: {event['repo']['name']}")
-                return True
+    try:
+        weeks = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]["weeks"]
+        for week in weeks:
+            for day in week["contributionDays"]:
+                if day["date"] == today and day["contributionCount"] > 0:
+                    print(f"✅ Found {day['contributionCount']} contributions on {today}")
+                    return True
+    except Exception as e:
+        print("⚠️ Error parsing GraphQL response:", e)
 
-    print("❌ No PushEvent found for today.")
+    print("❌ No contribution found for today.")
     return False
+
 
 def get_shame_stats():
     shame_files = sorted(
